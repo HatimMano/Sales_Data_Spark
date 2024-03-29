@@ -1,5 +1,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, sum, count, avg
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.regression import LinearRegression
+from pyspark.ml.evaluation import RegressionEvaluator
 
 # Création d'une session Spark
 spark = SparkSession.builder \
@@ -43,7 +46,6 @@ def preprocess_sales_data(data):
     # Nettoyage des données (ex. suppression des valeurs manquantes)
     cleaned_data = data.dropna()
     # Transformation des types de données si nécessaire
-    # (ex. conversion de colonnes en types appropriés)
     transformed_data = cleaned_data.withColumn('date', col('date').cast('date'))
     return transformed_data
 
@@ -55,14 +57,52 @@ def analyze_sales_by_category(data):
         .orderBy('total_revenue', ascending=False)
     return sales_by_category
 
-# Partie de test pour évaluer les performances du modèle
-def test_model_performance(data):
-    # Division des données en ensembles de formation et de test
-    train_data, test_data = data.randomSplit([0.8, 0.2], seed=123)
-    # Entraînement d'un modèle de prédiction de revenu (ex. régression linéaire)
-    # Évaluation du modèle sur les données de test
-    # Affichage des métriques de performance (ex. RMSE, R2)
-    # (Code d'entraînement et d'évaluation du modèle)
+# Fonction pour entraîner un modèle de régression linéaire de prédiction de revenu
+def train_linear_regression_model(train_data):
+    # Préparation des données pour l'entraînement du modèle
+    assembler = VectorAssembler(inputCols=['quantity'], outputCol='features')
+    train_data = assembler.transform(train_data)
+    
+    # Création du modèle de régression linéaire
+    lr = LinearRegression(featuresCol='features', labelCol='revenue')
+    
+    # Entraînement du modèle
+    lr_model = lr.fit(train_data)
+    
+    return lr_model
+
+# Fonction pour évaluer les performances du modèle sur les données de test
+def evaluate_model_performance(model, test_data):
+    # Préparation des données pour l'évaluation du modèle
+    test_data = assembler.transform(test_data)
+    
+    # Prédiction sur les données de test
+    predictions = model.transform(test_data)
+    
+    # Calcul des métriques de performance (RMSE et R2)
+    evaluator = RegressionEvaluator(labelCol='revenue', predictionCol='prediction', metricName='rmse')
+    rmse = evaluator.evaluate(predictions)
+    
+    evaluator = RegressionEvaluator(labelCol='revenue', predictionCol='prediction', metricName='r2')
+    r2 = evaluator.evaluate(predictions)
+    
+    return rmse, r2
+
+# Division des données en ensembles de formation et de test
+train_data, test_data = cleaned_sales_data.randomSplit([0.8, 0.2], seed=123)
+
+# Entraînement du modèle de régression linéaire
+linear_regression_model = train_linear_regression_model(train_data)
+
+# Évaluation des performances du modèle sur les données de test
+rmse, r2 = evaluate_model_performance(linear_regression_model, test_data)
+
+# Affichage des métriques de performance
+print("Métriques de performance du modèle de régression linéaire :")
+print("RMSE :", rmse)
+print("R2   :", r2)
+
+
 
 # Appel des fonctions pour prétraiter et analyser les données de ventes
 cleaned_sales_data = preprocess_sales_data(sales_data)
