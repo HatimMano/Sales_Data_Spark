@@ -1,15 +1,14 @@
-# Analyse de Données de Ventes avec Apache Spark
+# Sales Data Analysis with Apache Spark
 
-Ce projet utilise Apache Spark pour effectuer une analyse des données de ventes provenant d'une entreprise fictive. L'objectif est d'extraire des insights utiles à partir des données et de présenter les résultats de manière claire et concise.
+This project utilizes Apache Spark to perform an analysis of sales data from a fictional company. The goal is to extract useful insights from the data and present the findings in a clear and concise manner.
 
+## Project Structure
 
-## Structure du Projet
+- `sales.py`: The main script for sales data analysis.
+- `sales_data.csv`: The CSV file containing sales data.
+- `results/`: The directory containing analysis results (plots, reports, etc.). (Coming Soon)
 
-- `sales.py`: Le script principal pour l'analyse des données de ventes.
-- `sales_data.csv`: Le fichier CSV contenant les données de ventes.
-- `results/`: Le dossier contenant les résultats de l'analyse (graphiques, rapports, etc.). (A Venir)
+## Usage
 
-## Utilisation
-
-1. Exécutez le script `analyse_ventes.py` pour lancer l'analyse des données de ventes :
-2. Consultez les résultats générés dans le dossier `results`.
+1. Run the `sales.py` script to initiate the sales data analysis.
+2. Explore the generated results in the `results` directory.
